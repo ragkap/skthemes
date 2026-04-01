@@ -31,10 +31,10 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
 const pool = new Pool({
-  host: 'clients-api-prod-read-replica.c8z9wqzjlfg3.ap-southeast-1.rds.amazonaws.com',
-  user: 'skuser',
-  password: '3hkh8eDkQxe7EmzQgqHK',
-  database: 'clients_api_prod',
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
   ssl: { rejectUnauthorized: false },
   max: 3,
   connectionTimeoutMillis: 15000,
