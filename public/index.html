@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SK Theme Explorer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <nav class="tabs">
+        <button class="tab active" data-tab="followed">
+          Followed
+          <span class="followed-badge" id="followedBadge" style="display:none">0</span>
+        </button>
+        <button class="tab" data-tab="trending">Trending</button>
+        <button class="tab" data-tab="discover">Explore</button>
+      </nav>
+      <div class="header-right">
+        <label class="cs-toggle-label" id="csToggleHeader">
+          <span class="cs-toggle-text">Hide Country/Sector Themes</span>
+          <span class="cs-track" id="csTrack"><span class="cs-thumb"></span></span>
+        </label>
+        <button class="rebuild-btn" id="rebuildBtn" title="Rebuild cluster map" style="display:none">⟳ Rebuild Theme Clusters</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- ── EXPLORE ────────────────────────────────────────────────────────── -->
+    <section id="tab-discover" class="tab-panel">
+      <div class="toolbar">
+        <div class="search-bar">
+          <div class="search-input-wrap">
+            <svg class="search-icon" viewBox="0 0 20 20" fill="none"><circle cx="8.5" cy="8.5" r="5.5" stroke="currentColor" stroke-width="1.5"/><path d="M14 14l3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            <input type="text" id="searchInput" placeholder="Search themes…" autocomplete="off">
+          </div>
+          <select id="clusterFilter">
+            <option value="">All Theme Clusters</option>
+          </select>
+          <button class="clear-btn" id="clearFiltersBtn" style="display:none">✕ Clear</button>
+        </div>
+      </div>
+      <p class="results-count" id="discoverCount"></p>
+      <div class="theme-grid" id="discoverGrid"></div>
+      <div class="pagination" id="discoverPagination"></div>
+    </section>
+
+    <!-- ── TRENDING ───────────────────────────────────────────────────────── -->
+    <section id="tab-trending" class="tab-panel">
+      <div class="trending-hero" id="trendingHero"></div>
+      <div class="trending-list-section" id="trendingListSection" style="display:none">
+        <h3 class="trending-list-title">More Trending Themes</h3>
+        <div class="trend-list" id="trendingList"></div>
+      </div>
+    </section>
+
+    <!-- ── FOLLOWED ───────────────────────────────────────────────────────── -->
+    <section id="tab-followed" class="tab-panel active">
+      <div class="rhs-empty" id="followedEmpty">
+        <div class="empty-icon">◎</div>
+        <p>No followed themes yet.</p>
+        <p class="empty-sub"><a class="empty-tab-link" data-tab="trending">Discover Trending Themes</a>, or <a class="empty-tab-link" data-tab="discover">Explore all Themes</a></p>
+      </div>
+      <div class="followed-layout" id="followedLayout" style="display:none">
+        <aside class="followed-lhs">
+          <div class="followed-lhs-header">
+            <span class="followed-lhs-title">Followed</span>
+            <span class="followed-lhs-count" id="followedLhsCount">0</span>
+          </div>
+          <ul class="followed-theme-list" id="followedThemeList"></ul>
+        </aside>
+        <div class="followed-rhs">
+          <div class="rhs-empty" id="followedRhsEmpty">
+            <div class="empty-icon" style="font-size:26px">←</div>
+            <p>Select a theme to view insights</p>
+          </div>
+          <div class="insight-viewer" id="insightViewer" style="display:none">
+            <div class="insight-viewer-header">
+              <div class="insight-viewer-meta">
+                <h3 id="insightViewerTitle"></h3>
+                <span class="cluster-pill" id="insightViewerCluster"></span>
+              </div>
+              <div class="insight-viewer-ctas">
+                <button class="btn-primary" id="summarizeBtn">Summarise Latest Developments</button>
+                <button class="unfollow-btn" id="insightViewerUnfollow">Unfollow Theme</button>
+              </div>
+            </div>
+            <!-- AI inline -->
+            <div class="ai-inline" id="aiInline" style="display:none">
+              <div class="ai-inline-header">
+                <span class="ai-badge">AI Analysis</span>
+                <span id="aiTimestamp" class="ai-timestamp"></span>
+                <span id="aiCacheLabel" class="ai-cache-label" style="display:none"></span>
+                <button class="btn-copy" id="copyBtn" style="display:none">Copy to clipboard</button>
+                <button class="ai-collapse-btn" id="aiCollapseBtn">Collapse ↑</button>
+              </div>
+              <div class="ai-meta-row" id="aiMetaRow" style="display:none">
+                <span class="sentiment-badge" id="sentimentBadge"></span>
+                <span class="sentiment-reason" id="sentimentReason"></span>
+                <div class="actionability-wrap">
+                  <span class="actionability-label">Actionability</span>
+                  <div class="actionability-dots" id="actionabilityDots"></div>
+                  <span class="actionability-score-num" id="actionabilityNum"></span>
+                </div>
+              </div>
+              <div id="actionabilityReason" style="display:none;padding:4px 20px 8px;font-size:12px;color:var(--text-muted)"></div>
+              <div class="ai-loading" id="aiLoading" style="display:none">
+                <div class="spinner-sm"></div>
+                <span id="aiLoadingText">Generating analysis…</span>
+              </div>
+              <div class="ai-html-body" id="aiResultBody"></div>
+              <div class="ai-error" id="aiError" style="display:none"></div>
+            </div>
+            <div class="insight-viewer-body" id="insightViewerBody">
+              <div class="spinner"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Drawer -->
+  <div class="drawer-overlay" id="drawerOverlay"></div>
+  <aside class="drawer" id="drawer">
+    <div class="drawer-header">
+      <div>
+        <h3 id="drawerTitle"></h3>
+        <span class="cluster-pill" id="drawerCluster"></span>
+      </div>
+      <button class="drawer-close" id="drawerClose">✕</button>
+    </div>
+    <div class="drawer-actions">
+      <button class="btn-follow" id="drawerFollowBtn">+ Follow</button>
+    </div>
+    <div class="drawer-insights" id="drawerInsights">
+      <div class="spinner"></div>
+    </div>
+  </aside>
+
+  <!-- Rebuild modal -->
+  <div class="modal-overlay" id="rebuildModal" style="display:none">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Rebuild Cluster Map</h3>
+        <button class="drawer-close" id="rebuildModalClose">✕</button>
+      </div>
+      <div class="modal-body" id="rebuildModalBody"></div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
