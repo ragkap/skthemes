@@ -62,11 +62,18 @@ app.get('/api/themes/discover', async (req, res) => {
 
     const whereClause = where.length ? `WHERE ${where.join(' AND ')}` : '';
 
-    const countQ = await pool.query(`SELECT COUNT(DISTINCT theme_name) FROM insight_themes ${whereClause}`, params);
+    const countQ = await pool.query(
+      `SELECT COUNT(*) FROM (
+         SELECT theme_name FROM insight_themes ${whereClause}
+         GROUP BY theme_name HAVING COUNT(*) >= 10
+       ) t`,
+      params
+    );
     const rows = await pool.query(
       `SELECT theme_name, cached_cluster_name, COUNT(*) as insight_count, MAX(created_at) as latest_at
        FROM insight_themes ${whereClause}
        GROUP BY theme_name, cached_cluster_name
+       HAVING COUNT(*) >= 10
        ORDER BY insight_count DESC
        LIMIT $${idx++} OFFSET $${idx++}`,
       [...params, limit, offset]
@@ -91,6 +98,7 @@ app.get('/api/themes/trending', async (req, res) => {
       FROM insight_themes
       WHERE created_at > NOW() - INTERVAL '90 days' ${csFilter}
       GROUP BY theme_name, cached_cluster_name
+      HAVING COUNT(*) >= 10
       ORDER BY insight_count DESC LIMIT 100`);
     res.json(rows.rows.map(r => ({ ...r, macro_cluster: clusterMap[r.cached_cluster_name] || r.cached_cluster_name })));
   } catch (err) { res.status(500).json({ error: err.message }); }
