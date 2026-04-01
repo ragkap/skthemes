@@ -35,14 +35,27 @@ function setCachedSummary(theme, data) {
 }
 
 /* ── Header CS Toggle (universal) ────────────────────────────────────────── */
-$('csToggleHeader').addEventListener('click', () => {
-  state.hideCS = !state.hideCS;
+function applyCSToggle() {
   $('csToggleHeader').dataset.active = state.hideCS;
+  $('mobileCSToggle').dataset.active = state.hideCS;
   state.discover.page = 1;
   loadDiscover();
   trendingLoaded = false;
   if (state.tab === 'trending') loadTrending();
+}
+$('csToggleHeader').addEventListener('click', () => { state.hideCS = !state.hideCS; applyCSToggle(); });
+
+/* ── Mobile 3-dot menu ────────────────────────────────────────────────────── */
+$('mobileMenuBtn').addEventListener('click', e => {
+  e.stopPropagation();
+  $('mobileMenuDropdown').classList.toggle('open');
 });
+$('mobileCSToggle').addEventListener('click', () => {
+  state.hideCS = !state.hideCS;
+  applyCSToggle();
+  $('mobileMenuDropdown').classList.remove('open');
+});
+document.addEventListener('click', () => $('mobileMenuDropdown').classList.remove('open'));
 
 /* ── Empty state tab links ────────────────────────────────────────────────── */
 document.querySelectorAll('.empty-tab-link').forEach(a => {
@@ -741,6 +754,7 @@ function fmtDate(iso) { if (!iso) return ''; return new Date(iso).toLocaleDateSt
 
 /* ── Init ─────────────────────────────────────────────────────────────────── */
 $('csToggleHeader').dataset.active = 'true';
+$('mobileCSToggle').dataset.active = 'true';
 updateBadge();
 loadClusters(); // preload clusters for when user navigates to Explore
 renderFollowed();

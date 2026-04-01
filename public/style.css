@@ -93,6 +93,30 @@ header {
 .cs-toggle-label[data-active="true"] .cs-track { background: var(--accent); }
 .cs-toggle-label[data-active="true"] .cs-thumb { transform: translateX(18px); }
 
+/* ── Mobile 3-dot menu ────────────────────────────────────────────────────── */
+.mobile-menu-wrap { display: none; position: relative; }
+.mobile-menu-btn {
+  background: none; border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+  color: var(--text-muted); font-size: 18px; line-height: 1; padding: 3px 9px;
+  cursor: pointer; transition: border-color .15s;
+}
+.mobile-menu-btn:hover { border-color: var(--accent); color: var(--text); }
+.mobile-menu-dropdown {
+  display: none; position: absolute; top: calc(100% + 8px); right: 0;
+  background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius);
+  box-shadow: var(--shadow-lg); min-width: 230px; z-index: 200; padding: 6px 0;
+}
+.mobile-menu-dropdown.open { display: block; }
+.mobile-menu-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 16px; gap: 12px; cursor: pointer; user-select: none;
+  font-size: 14px; font-weight: 500; color: var(--text-muted);
+}
+.mobile-menu-item:hover { background: var(--bg); color: var(--text); }
+.mobile-cs-track { flex-shrink: 0; }
+.mobile-menu-item[data-active="true"] .mobile-cs-track { background: var(--accent); }
+.mobile-menu-item[data-active="true"] .mobile-cs-track .cs-thumb { transform: translateX(18px); }
+
 .rebuild-btn {
   background: none; border: 1.5px solid var(--border); color: var(--text-muted);
   font-size: 14px; font-family: var(--font); padding: 6px 14px;
@@ -518,8 +542,18 @@ main { max-width: 1232px; margin: 0 auto; padding: 28px 24px; }
 @media (max-width: 768px) {
   /* Header */
   .header-inner { padding: 0 14px; gap: 8px; flex-wrap: wrap; height: auto; min-height: 52px; padding-top: 8px; padding-bottom: 8px; }
-  .cs-toggle-text { display: none; }
+  .cs-toggle-label { display: none; }
+  .mobile-menu-wrap { display: block; }
   .rebuild-btn { display: none !important; }
+
+  /* Compact hero cards */
+  .hero-card { padding: 14px 16px; gap: 8px; }
+  .hero-card-name { font-size: 14px; }
+  .hero-card-cluster { font-size: 12px; }
+  .hero-card-count { font-size: 22px; }
+  .hero-card-count-label { font-size: 11px; }
+  .hero-card-follow { font-size: 13px; padding: 5px 12px; }
+  .hero-bar-wrap { height: 3px; }
 
   /* Main */
   main { padding: 14px; }
