@@ -8,7 +8,6 @@ const { spawn } = require('child_process');
 
 // ── Canonical cluster mapping ────────────────────────────────────────────────
 const CANONICAL_MAP_PATH = path.join(__dirname, 'cluster_canonical.json');
-const MACROS_PATH = path.join(__dirname, 'cluster_macros.json');
 const BUILD_STATUS_PATH = path.join(__dirname, 'build-status.json');
 
 let clusterMap = {};
@@ -17,11 +16,9 @@ let macroList = [];
 function loadClusterMap() {
   if (fs.existsSync(CANONICAL_MAP_PATH)) {
     clusterMap = JSON.parse(fs.readFileSync(CANONICAL_MAP_PATH, 'utf8'));
-    console.log(`Cluster map: ${Object.keys(clusterMap).length} entries`);
-  }
-  if (fs.existsSync(MACROS_PATH)) {
-    macroList = JSON.parse(fs.readFileSync(MACROS_PATH, 'utf8')).sort();
-    console.log(`Macros: ${macroList.length}`);
+    // Derive macroList from actual values in clusterMap (source of truth)
+    macroList = [...new Set(Object.values(clusterMap))].sort();
+    console.log(`Cluster map: ${Object.keys(clusterMap).length} entries, ${macroList.length} macro clusters`);
   }
 }
 loadClusterMap();
