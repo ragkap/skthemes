@@ -25,7 +25,6 @@ function loadClusterMap() {
   }
 }
 loadClusterMap();
-fs.watchFile(CANONICAL_MAP_PATH, () => { console.log('Map updated'); loadClusterMap(); });
 
 const app = express();
 app.use(express.json());
@@ -37,7 +36,7 @@ const pool = new Pool({
   password: '3hkh8eDkQxe7EmzQgqHK',
   database: 'clients_api_prod',
   ssl: { rejectUnauthorized: false },
-  max: 10,
+  max: 3,
   connectionTimeoutMillis: 15000,
 });
 
@@ -272,5 +271,8 @@ app.post('/api/admin/rebuild-clusters', (req, res) => {
   res.json({ started: true, pid: child.pid });
 });
 
-const PORT = process.env.PORT || 3002;
-app.listen(PORT, () => console.log(`SK Theme Explorer running at http://localhost:${PORT}`));
+if (require.main === module) {
+  const PORT = process.env.PORT || 3002;
+  app.listen(PORT, () => console.log(`SK Theme Explorer running at http://localhost:${PORT}`));
+}
+module.exports = app;
