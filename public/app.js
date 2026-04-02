@@ -469,8 +469,8 @@ async function loadInsightViewer(name) {
   body.innerHTML = '';
   if (!data.length) { body.innerHTML = '<p style="color:var(--text-muted);font-size:13px;padding:8px 0">No insights found.</p>'; return; }
   const countLabel = document.createElement('div');
-  countLabel.style.cssText = 'font-size:12px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin-bottom:14px;padding-top:4px';
-  countLabel.textContent = `${data.length} most recent insights · newest first`;
+  countLabel.style.cssText = 'font-size:12px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.6px;font-weight:700;margin-bottom:14px;padding-top:16px';
+  countLabel.textContent = `${data.length} most recent Insight Summaries · newest first`;
   body.appendChild(countLabel);
   data.forEach(item => {
     const div = document.createElement('div');
@@ -494,7 +494,8 @@ function showAISummary(data, fromCache) {
   const { html, ts, sentiment, sentimentReason, actionability, actionabilityReason } = data;
   $('aiInline').style.display = '';
   $('aiLoading').style.display = 'none';
-  $('aiResultBody').innerHTML = html;
+  const DISCLAIMER = 'This content is AI-generated and displayed for general informational purposes only. Please verify independently before use.';
+  $('aiResultBody').innerHTML = html + `<p class="ai-disclaimer">${DISCLAIMER}</p>`;
   $('aiError').style.display = 'none';
 
   const d = new Date(ts);

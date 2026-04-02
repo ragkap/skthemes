@@ -632,3 +632,28 @@ main { max-width: 1232px; margin: 0 auto; padding: 28px 24px; }
   .theme-card { padding: 14px; }
   .trend-meta { display: none; }
 }
+
+.ai-disclaimer {
+  font-size: 11px;
+  color: var(--text-muted);
+  border-top: 1px solid var(--border);
+  margin-top: 20px;
+  padding-top: 10px;
+  font-style: italic;
+}
+
+.site-footer {
+  text-align: center;
+  padding: 16px;
+  font-size: 12px;
+  color: #888;
+  border-top: 1px solid #e5e7eb;
+  margin-top: 32px;
+}
+.site-footer a {
+  color: inherit;
+  text-decoration: none;
+}
+.site-footer a:hover {
+  text-decoration: underline;
+}
