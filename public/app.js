@@ -656,8 +656,19 @@ function toggleFollow(name, btn) {
     dfBtn.classList.toggle('following', nowFollowing);
     dfBtn.textContent = nowFollowing ? 'Following' : '+ Follow';
     dfBtn.onclick = () => toggleFollow(name, dfBtn);
+    const summaryLink = $('drawerSummaryLink');
+    summaryLink.style.display = nowFollowing ? '' : 'none';
+    summaryLink.onclick = () => { closeDrawer(); switchToFollowedSummary(name); };
   }
   if (!nowFollowing && state.selectedFollowedTheme === name) renderFollowed();
+}
+
+function switchToFollowedSummary(name) {
+  state.tab = 'followed';
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === 'followed'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'tab-followed'));
+  state.selectedFollowedTheme = name;
+  renderFollowed();
 }
 
 /* ── Drawer ───────────────────────────────────────────────────────────────── */
@@ -673,6 +684,9 @@ async function openDrawer(t) {
   dfBtn.classList.toggle('following', following);
   dfBtn.textContent = following ? 'Following' : '+ Follow';
   dfBtn.onclick = () => toggleFollow(themeName, dfBtn);
+  const summaryLink = $('drawerSummaryLink');
+  summaryLink.style.display = following ? '' : 'none';
+  summaryLink.onclick = () => { closeDrawer(); switchToFollowedSummary(themeName); };
 
   $('drawerInsights').innerHTML = '<div class="spinner"></div>';
   $('drawer').classList.add('active');

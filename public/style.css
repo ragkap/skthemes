@@ -423,11 +423,20 @@ main { max-width: 1232px; margin: 0 auto; padding: 28px 24px; }
 #summarizeBtn:not(:disabled) { animation: pulse-ring 2s ease-out infinite; }
 
 .btn-follow {
-  background: none; border: 1.5px solid var(--accent); color: var(--accent);
-  padding: 9px 22px; border-radius: var(--radius-pill); font-size: 14px; font-family: var(--font);
-  font-weight: 700; cursor: pointer; transition: all .15s;
+  background: none; border: 1px solid var(--border); color: var(--text-muted);
+  padding: 6px 16px; border-radius: var(--radius-pill); font-size: 13px; font-family: var(--font);
+  font-weight: 500; cursor: pointer; transition: all .15s;
 }
-.btn-follow:hover, .btn-follow.following { background: var(--accent); color: white; }
+.btn-follow:hover { border-color: var(--accent); color: var(--accent); }
+.btn-follow.following { border-color: var(--border); color: var(--text-muted); background: none; }
+.btn-follow.following:hover { border-color: #e05; color: #e05; }
+
+.btn-summary-link {
+  background: var(--accent); border: none; color: white; font-size: 13px; font-family: var(--font);
+  font-weight: 700; cursor: pointer; padding: 8px 18px; border-radius: var(--radius-pill);
+  transition: opacity .15s;
+}
+.btn-summary-link:hover { opacity: .85; }
 
 /* ── Spinner ──────────────────────────────────────────────────────────────── */
 .spinner { width: 28px; height: 28px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .7s linear infinite; margin: 28px auto; }
