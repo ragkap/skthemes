@@ -218,7 +218,10 @@ CRITICAL: The "html" field must use only HTML tags — absolutely NO markdown sy
 Return ONLY a valid JSON object — no markdown wrapper, no code fences, no explanation outside the JSON:
 {"sentiment":"...","sentiment_reason":"...","actionability":N,"actionability_reason":"...","html":"..."}`;
 
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+    const model = genAI.getGenerativeModel(
+      { model: 'gemini-2.5-flash' },
+      { generationConfig: { maxOutputTokens: 8192 } }
+    );
     const result = await model.generateContent(prompt);
     const raw = result.response.text();
     const jsonMatch = raw.match(/\{[\s\S]*\}/);
@@ -226,7 +229,19 @@ Return ONLY a valid JSON object — no markdown wrapper, no code fences, no expl
     try {
       parsed = JSON.parse(jsonMatch ? jsonMatch[0] : raw.trim());
     } catch {
-      parsed = { html: raw.trim(), sentiment: null, actionability: null };
+      // Partial/truncated JSON — extract fields via regex rather than showing raw JSON
+      const extract = (key) => { const m = raw.match(new RegExp(`"${key}"\\s*:\\s*"((?:[^"\\\\]|\\\\.)*)"`)); return m ? m[1] : null; };
+      const extractNum = (key) => { const m = raw.match(new RegExp(`"${key}"\\s*:\\s*(\\d+)`)); return m ? parseInt(m[1]) : null; };
+      // Extract html: find the opening of the html field value and take everything after it
+      const htmlMatch = raw.match(/"html"\s*:\s*"([\s\S]*)/);
+      const htmlRaw = htmlMatch ? htmlMatch[1].replace(/\\n/g, '\n').replace(/\\"/g, '"').replace(/\\t/g, '\t').replace(/\\\\/g, '\\') : '';
+      parsed = {
+        sentiment: extract('sentiment'),
+        sentiment_reason: extract('sentiment_reason'),
+        actionability: extractNum('actionability'),
+        actionability_reason: extract('actionability_reason'),
+        html: htmlRaw,
+      };
     }
     // Post-process: convert any residual markdown to HTML
     parsed.html = mdToHtml(parsed.html || '');
