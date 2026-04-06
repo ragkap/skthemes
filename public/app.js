@@ -34,6 +34,14 @@ function setCachedSummary(theme, data) {
   } catch {}
 }
 
+function deleteCachedSummary(theme) {
+  try {
+    const cache = JSON.parse(localStorage.getItem(AI_CACHE_KEY) || '{}');
+    delete cache[theme];
+    localStorage.setItem(AI_CACHE_KEY, JSON.stringify(cache));
+  } catch {}
+}
+
 /* ── Header CS Toggle (universal) ────────────────────────────────────────── */
 function applyCSToggle() {
   $('csToggleHeader').dataset.active = state.hideCS;
@@ -508,8 +516,10 @@ function showAISummary(data, fromCache) {
     const ageLabel = ageDays >= 1 ? `${ageDays}d ago` : ageHours >= 1 ? `${ageHours}h ago` : 'just now';
     $('aiCacheLabel').textContent = `Cached · ${ageLabel}`;
     $('aiCacheLabel').style.display = '';
+    $('refreshSummaryBtn').style.display = '';
   } else {
     $('aiCacheLabel').style.display = 'none';
+    $('refreshSummaryBtn').style.display = 'none';
   }
   // Sentiment + Actionability
   if (sentiment) {
@@ -563,9 +573,7 @@ function stopLoadingMessages() {
   if (_loadingTimer) { clearInterval(_loadingTimer); _loadingTimer = null; }
 }
 
-$('summarizeBtn').addEventListener('click', async () => {
-  const theme = state.selectedFollowedTheme;
-  if (!theme) return;
+async function runSummarize(theme, force = false) {
   const btn = $('summarizeBtn');
   btn.disabled = true;
   $('aiInline').style.display = '';
@@ -575,11 +583,12 @@ $('summarizeBtn').addEventListener('click', async () => {
   $('aiError').style.display = 'none';
   $('copyBtn').style.display = 'none';
   $('aiCacheLabel').style.display = 'none';
+  $('refreshSummaryBtn').style.display = 'none';
 
   try {
     const data = await fetch('/api/themes/summarize', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ theme }),
+      body: JSON.stringify({ theme, force }),
     }).then(r => r.json());
     if (data.error) throw new Error(data.error);
     const entry = { html: data.html, ts: Date.now(), sentiment: data.sentiment, sentimentReason: data.sentimentReason, actionability: data.actionability, actionabilityReason: data.actionabilityReason };
@@ -589,7 +598,6 @@ $('summarizeBtn').addEventListener('click', async () => {
     if (state.selectedFollowedTheme === theme) {
       $('aiError').textContent = `Error: ${err.message}`;
       $('aiError').style.display = '';
-      btn.textContent = 'Summarise Latest Developments';
     }
   } finally {
     stopLoadingMessages();
@@ -598,6 +606,19 @@ $('summarizeBtn').addEventListener('click', async () => {
       btn.disabled = false;
     }
   }
+}
+
+$('summarizeBtn').addEventListener('click', () => {
+  const theme = state.selectedFollowedTheme;
+  if (!theme) return;
+  runSummarize(theme);
+});
+
+$('refreshSummaryBtn').addEventListener('click', () => {
+  const theme = state.selectedFollowedTheme;
+  if (!theme) return;
+  deleteCachedSummary(theme);
+  runSummarize(theme, true);
 });
 
 $('copyBtn').addEventListener('click', async () => {

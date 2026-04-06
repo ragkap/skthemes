@@ -362,6 +362,13 @@ main { max-width: 1232px; margin: 0 auto; padding: 28px 24px; }
   font-size: 13px; color: var(--accent); font-weight: 500;
   background: var(--accent-light); padding: 2px 8px; border-radius: var(--radius-pill);
 }
+.btn-refresh-summary {
+  background: none; border: 1px solid var(--border); color: var(--text-muted);
+  font-size: 12px; font-family: var(--font); font-weight: 500;
+  padding: 3px 10px; border-radius: var(--radius-pill); cursor: pointer; transition: all .15s;
+}
+.btn-refresh-summary:hover { border-color: var(--accent); color: var(--accent); }
+
 .btn-copy {
   margin-left: auto;
   background: var(--accent); color: white; border: none;
