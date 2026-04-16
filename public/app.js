@@ -652,8 +652,28 @@ $('copyBtn').addEventListener('click', async () => {
       btn.classList.add('copied');
       setTimeout(() => { btn.textContent = 'Copy to clipboard'; btn.classList.remove('copied'); }, 2000);
     } catch {
-      btn.textContent = 'Copy failed';
-      setTimeout(() => { btn.textContent = 'Copy to clipboard'; }, 2000);
+      // Final fallback: execCommand works in iframes without clipboard-write permission
+      try {
+        const ta = document.createElement('textarea');
+        ta.value = fullText;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.focus();
+        ta.select();
+        const ok = document.execCommand('copy');
+        document.body.removeChild(ta);
+        if (ok) {
+          btn.textContent = 'Copied (text) ✓';
+          btn.classList.add('copied');
+          setTimeout(() => { btn.textContent = 'Copy to clipboard'; btn.classList.remove('copied'); }, 2000);
+        } else {
+          throw new Error('execCommand failed');
+        }
+      } catch {
+        btn.textContent = 'Copy failed';
+        setTimeout(() => { btn.textContent = 'Copy to clipboard'; }, 2000);
+      }
     }
   }
 });

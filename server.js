@@ -243,6 +243,9 @@ Return ONLY a valid JSON object — no markdown wrapper, no code fences, no expl
         html: htmlRaw,
       };
     }
+    // Strip trailing JSON/markdown artifacts (e.g. `" } ``` `) after the last HTML closing tag
+    const lastAngle = (parsed.html || '').lastIndexOf('>');
+    if (lastAngle !== -1) parsed.html = parsed.html.substring(0, lastAngle + 1);
     // Post-process: convert any residual markdown to HTML
     parsed.html = mdToHtml(parsed.html || '');
 
